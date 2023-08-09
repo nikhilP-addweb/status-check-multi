@@ -2,60 +2,39 @@ pipeline {
     agent any
     
     stages {
-        stage('configuration') {
-            steps {
-                echo 'BRANCH NAME: ' + env.BRANCH_NAME
-                echo sh(returnStdout: true, script: 'env')
-            }
-        }
-        
-        stage('Testing') {
+        stage('Validation') {
             steps {
                 script {
-                    sh 'echo "Testing"'
-                    sh "cat file.txt"
+                    sh 'composer validate'
                 }
-            }
-        }
-        
-        stage("build"){
-            when {
-                branch 'main'
-            }
-            
-            steps{
-                sh 'echo "Build Started"'
-            }
-        }
-
-        stage("Deploy"){
-            when {
-                branch 'main'
-            }
-            
-            steps{
-                sh 'echo "Deploying App"'
             }
         }
     }
     
-    post{
-        success{
-            setBuildStatus("Build succeeded", "SUCCESS");
+    post {
+        success {
+            script {
+                setBuildStatus("Validation succeeded", "SUCCESS")
+            }
         }
 
         failure {
-            setBuildStatus("Build failed", "FAILURE");
+            script {
+                setBuildStatus("Validation failed", "FAILURE")
+            }
         } 
     }
 }
 
 void setBuildStatus(String message, String state) {
-    step([
-        $class: "GitHubCommitStatusSetter",
-        reposSource: [$class: "ManuallyEnteredRepositorySource", url: "https://github.com/vaibhavkumar779/multibranchJenkinsPRbuildStatus"],
-        contextSource: [$class: "ManuallyEnteredCommitContextSource", context: "ci/jenkins/build-status"],
-        errorHandlers: [[$class: "ChangingBuildStatusErrorHandler", result: "UNSTABLE"]],
-        statusResultSource: [$class: "ConditionalStatusResultSource", results: [[$class: "AnyBuildResult", message: message, state: state]]]
-    ]);
+    script {
+        step([
+            $class: "GitHubCommitStatusSetter",
+            reposSource: [$class: "ManuallyEnteredRepositorySource", url: "https://github.com/nikhilP-addweb/status-check-multi"],
+            contextSource: [$class: "ManuallyEnteredCommitContextSource", context: "ci/jenkins/build-status"],
+            errorHandlers: [[$class: "ChangingBuildStatusErrorHandler", result: "UNSTABLE"]],
+            statusResultSource: [$class: "ConditionalStatusResultSource", results: [[$class: "AnyBuildResult", message: message, state: state]]]
+        ])
+    }
 }
+	
