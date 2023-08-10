@@ -13,8 +13,6 @@ pipeline {
             steps {
                 script {
                     sh 'echo "Testing"'
-                    sh 'cd /var/lib/jenkins/jobs/status-check-multi/workspace'
-                    sh 'composer install'
                 }
             }
         }
@@ -26,6 +24,8 @@ pipeline {
             
             steps{
                 sh 'echo "Build Status"'
+                sh 'cd /var/lib/jenkins/jobs/status-check-multi/branches/stg/workspace'
+                sh 'composer install'
             }
         }
 
