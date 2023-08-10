@@ -6,7 +6,7 @@ pipeline {
             steps {
                 script {
                     sh 'cd /var/lib/jenkins/jobs/status-check-decl-pipe/workspace'
-                    sh 'composer validate'
+                    sh 'composer install'
                 }
             }
         }
